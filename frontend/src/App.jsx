@@ -8,6 +8,7 @@ import Lobby from './pages/Lobby';
 import RevealRole from './pages/RevealRole';
 import Round from './pages/Round';
 import EndGame from './pages/EndGame';
+import Rejoin from './pages/Rejoin';
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
           <Route path="/reveal/:roomCode" element={<RevealRole />} />
           <Route path="/round/:roomCode" element={<Round />} />
           <Route path="/end/:roomCode" element={<EndGame />} />
+          <Route path="/rejoin/:roomCode" element={<Rejoin />} />
         </Routes>
       </GameProvider>
     </BrowserRouter>

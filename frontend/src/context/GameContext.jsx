@@ -1,33 +1,37 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { io } from 'socket.io-client';
 
 const GameContext = createContext(null);
 
 export function GameProvider({ children }) {
-  const [playerId, setPlayerId] = useState(() => localStorage.getItem('mafiaPlayerId') || null);
+  const [playerId, setPlayerId]     = useState(() => localStorage.getItem('mafiaPlayerId') || null);
   const [playerName, setPlayerName] = useState(() => localStorage.getItem('mafiaPlayerName') || '');
-  const [roomCode, setRoomCode] = useState(() => localStorage.getItem('mafiaRoomCode') || null);
-  const [isHost, setIsHost] = useState(() => localStorage.getItem('mafiaIsHost') === 'true');
-  const [room, setRoom] = useState(null);
+  const [roomCode, setRoomCode]     = useState(() => localStorage.getItem('mafiaRoomCode') || null);
+  const [isHost, setIsHost]         = useState(() => localStorage.getItem('mafiaIsHost') === 'true');
+  const [room, setRoom]             = useState(null);
   const socketRef = useRef(null);
 
-  // Initialize socket
+  // Create socket once on mount
   useEffect(() => {
-    socketRef.current = io(import.meta.env.VITE_BACKEND_URL || window.location.origin, {
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || window.location.origin;
+    socketRef.current = io(backendUrl, {
       autoConnect: false,
       withCredentials: true,
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1500,
     });
+
     return () => {
       socketRef.current?.disconnect();
     };
   }, []);
 
-  function saveSession(data) {
-    const { playerId: pid, playerName: pname, roomCode: code, isHost: host } = data;
-    if (pid) { setPlayerId(pid); localStorage.setItem('mafiaPlayerId', pid); }
-    if (pname) { setPlayerName(pname); localStorage.setItem('mafiaPlayerName', pname); }
-    if (code) { setRoomCode(code); localStorage.setItem('mafiaRoomCode', code); }
-    if (host !== undefined) { setIsHost(host); localStorage.setItem('mafiaIsHost', host); }
+  function saveSession({ playerId: pid, playerName: pname, roomCode: code, isHost: host }) {
+    if (pid)              { setPlayerId(pid);       localStorage.setItem('mafiaPlayerId',   pid); }
+    if (pname)            { setPlayerName(pname);   localStorage.setItem('mafiaPlayerName', pname); }
+    if (code)             { setRoomCode(code);      localStorage.setItem('mafiaRoomCode',   code); }
+    if (host !== undefined) { setIsHost(host);      localStorage.setItem('mafiaIsHost',     String(host)); }
   }
 
   function clearSession() {
@@ -40,12 +44,28 @@ export function GameProvider({ children }) {
     localStorage.removeItem('mafiaPlayerName');
     localStorage.removeItem('mafiaRoomCode');
     localStorage.removeItem('mafiaIsHost');
+    // Disconnect socket on full session clear
+    socketRef.current?.disconnect();
   }
+
+  // Convenience: connect + join room in one call
+  const connectToRoom = useCallback((code, pid) => {
+    if (!socketRef.current) return;
+    if (!socketRef.current.connected) socketRef.current.connect();
+    socketRef.current.emit('joinRoom', { roomCode: code, playerId: pid });
+  }, []);
 
   return (
     <GameContext.Provider value={{
-      playerId, playerName, roomCode, isHost, room,
-      setRoom, saveSession, clearSession,
+      playerId,
+      playerName,
+      roomCode,
+      isHost,
+      room,
+      setRoom,
+      saveSession,
+      clearSession,
+      connectToRoom,
       socket: socketRef.current,
     }}>
       {children}

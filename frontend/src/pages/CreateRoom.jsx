@@ -53,6 +53,9 @@ export default function CreateRoom() {
         </div>
 
         <div className="card card-glow-gold animate-scaleIn delay-1">
+          <p className="page-subtitle" style={{ marginBottom: '1.5rem' }}>
+            You will become the <strong style={{ color: 'var(--gold-bright)' }}>God</strong> — the all-knowing host who runs the game.
+          </p>
 
           {error && <div className="error-msg">{error}</div>}
 
@@ -94,6 +97,7 @@ export default function CreateRoom() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             {[
               ['⚡', 'A unique room code will be generated'],
+              ['👁️', 'You will be assigned the God role'],
               ['👑', 'Only you can start and manage the game'],
             ].map(([icon, text]) => (
               <div key={text} style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>

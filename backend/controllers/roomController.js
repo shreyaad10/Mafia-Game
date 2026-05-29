@@ -284,6 +284,107 @@ async function endGame(req, res) {
   }
 }
 
+// POST /api/rooms/:code/reset  — reuse same room code for a new game
+async function resetRoom(req, res) {
+  try {
+    const code = req.params.code.toUpperCase();
+    const { playerId, playerName } = req.body;
+
+    const room = await Room.findOne({ code });
+    if (!room) return res.status(404).json({ error: 'Room not found' });
+
+    if (room.hostId.toString() !== playerId) {
+      return res.status(403).json({ error: 'Only the host can reset the room' });
+    }
+
+    // Delete all old players
+    await Player.deleteMany({ roomCode: code });
+
+    // Create fresh host player with same name
+    const host = new Player({
+      name: playerName.trim(),
+      roomCode: code,
+      isHost: true,
+    });
+    await host.save();
+
+    // Reset room state
+    room.players = [host._id];
+    room.hostId = host._id;
+    room.status = 'waiting';
+    room.currentRound = 0;
+    room.winner = null;
+    room.rolesAssigned = false;
+    await room.save();
+
+    const updatedRoom = await Room.findOne({ code }).populate('players');
+    req.io.to(code).emit('roomReset', formatRoom(updatedRoom));
+
+    return res.json({
+      roomCode: code,
+      playerId: host._id,
+      isHost: true,
+    });
+  } catch (err) {
+    console.error('resetRoom error:', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
+// POST /api/rooms/:code/leave
+async function leaveRoom(req, res) {
+  try {
+    const code = req.params.code.toUpperCase();
+    const { playerId } = req.body;
+
+    const room = await Room.findOne({ code }).populate('players');
+    if (!room) return res.status(404).json({ error: 'Room not found' });
+
+    const isHost = room.hostId.toString() === playerId;
+
+    // Remove player from room
+    room.players = room.players.filter((p) => p._id.toString() !== playerId);
+    await Player.findByIdAndDelete(playerId);
+
+    // If host leaves and game hasn't started, try to assign new host
+    if (isHost && room.status === 'waiting') {
+      if (room.players.length > 0) {
+        const newHost = room.players[0];
+        room.hostId = newHost._id;
+        await Player.findByIdAndUpdate(newHost._id, { isHost: true });
+      } else {
+        // No players left — delete room
+        await Room.findByIdAndDelete(room._id);
+        return res.json({ success: true, roomDeleted: true });
+      }
+    }
+
+    // If host leaves mid-game, end the game
+    if (isHost && room.status === 'in_progress') {
+      room.status = 'ended';
+      room.winner = null;
+      await room.save();
+      const updatedRoom = await Room.findOne({ code }).populate('players');
+      req.io.to(code).emit('gameEnded', {
+        winner: null,
+        room: formatRoom(updatedRoom),
+        reason: 'hostLeft',
+      });
+      return res.json({ success: true, hostLeft: true });
+    }
+
+    await room.save();
+
+    const updatedRoom = await Room.findOne({ code }).populate('players');
+    req.io.to(code).emit('roomUpdate', formatRoom(updatedRoom));
+
+    return res.json({ success: true });
+  } catch (err) {
+    console.error('leaveRoom error:', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
 function formatRoom(room) {
   return {
     code: room.code,
@@ -311,5 +412,7 @@ module.exports = {
   eliminatePlayer,
   nextRound,
   endGame,
+  leaveRoom,
+  resetRoom,
   formatRoom,
 };
