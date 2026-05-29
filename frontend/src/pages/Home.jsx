@@ -275,7 +275,7 @@ export default function Home() {
 
         {/* Footer ornament */}
         <div style={{ marginTop: '3rem', color: 'var(--text-dim)', fontSize: '0.7rem', letterSpacing: '0.4em', fontFamily: 'var(--font-heading)' }}>
-          ✦ COMPANION APP ✦
+          ✦ Designed and Developed by Shreya Desai ✦
         </div>
       </div>
     </div>
