@@ -248,7 +248,7 @@ export default function Lobby() {
                   <div className="player-avatar">{p.name.charAt(0)}</div>
                   <span className="player-name">{p.name}</span>
                   <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-                    {p.isHost && <span className="player-badge badge-host">👑 God</span>}
+                    {p.isHost && <span className="player-badge badge-host">👑 Host</span>}
                     {p._id === playerId && <span className="player-badge badge-you">You</span>}
                   </div>
                 </div>
