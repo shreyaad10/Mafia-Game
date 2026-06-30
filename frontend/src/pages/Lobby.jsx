@@ -157,7 +157,7 @@ export default function Lobby() {
       <div className="content-wide animate-fadeUp">
 
         {/* ── TOP BAR ── */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+        <div className="responsive-row" style={{ marginBottom: '1.5rem' }}>
           {/* Leave button */}
           {!leaveConfirm ? (
             <button
@@ -227,7 +227,7 @@ export default function Lobby() {
         </div>
 
         {/* ── MAIN GRID ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', gap: '1.25rem' }}>
+        <div className="responsive-grid-two">
 
           {/* Player list */}
           <div className="card animate-scaleIn delay-2">
@@ -260,7 +260,7 @@ export default function Lobby() {
           </div>
 
           {/* Right panel */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <div className="responsive-stack">
 
             {/* Game info */}
             <div className="card animate-scaleIn delay-3">

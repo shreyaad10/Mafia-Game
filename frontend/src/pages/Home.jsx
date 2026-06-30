@@ -122,7 +122,7 @@ export default function Home() {
             style={{ marginBottom: '1.5rem', textAlign: 'left' }}
           >
             {/* Header */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
+            <div className="responsive-row" style={{ marginBottom: '1.25rem' }}>
               <div style={{
                 width: 40, height: 40, borderRadius: '50%',
                 background: 'linear-gradient(135deg, rgba(212,160,23,0.3), rgba(212,160,23,0.1))',
@@ -159,7 +159,7 @@ export default function Home() {
             </div>
 
             {/* Session info */}
-            <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.25rem' }}>
+            <div className="action-row" style={{ marginBottom: '1.25rem' }}>
               {[
                 ['Player', activeSession.player.name],
                 ['Role', isHost ? '👑 Host' : 'Player'],
@@ -181,7 +181,7 @@ export default function Home() {
 
             {/* Buttons */}
             {!leaveConfirm ? (
-              <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <div className="action-row">
                 <button
                   className="btn btn-gold"
                   style={{ flex: 2 }}
@@ -198,7 +198,7 @@ export default function Home() {
                 </button>
               </div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+              <div className="action-stack">
                 <p style={{
                   fontFamily: 'var(--font-body)',
                   fontSize: '0.9rem',
@@ -210,7 +210,7 @@ export default function Home() {
                     ? 'You are the host. Leaving will transfer host to the next player, or delete the room if empty.'
                     : 'Are you sure you want to leave this room?'}
                 </p>
-                <div style={{ display: 'flex', gap: '0.6rem' }}>
+                <div className="action-row">
                   <button
                     className="btn btn-red"
                     style={{ flex: 1 }}
@@ -257,7 +257,7 @@ export default function Home() {
         )}
 
         {/* Action buttons */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '320px', margin: '0 auto' }}>
+        <div className="responsive-actions">
           <button
             className="btn btn-gold animate-fadeUp delay-2"
             onClick={() => { clearSession(); navigate('/create'); }}

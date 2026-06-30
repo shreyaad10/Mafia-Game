@@ -252,7 +252,7 @@ export default function EndGame() {
 
         {/* ── STATS ── */}
         <div className="card animate-scaleIn delay-3" style={{ marginBottom: '1.5rem' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', textAlign: 'center' }}>
+          <div className="stats-grid">
             {[
               ['Rounds Played', roomData?.currentRound || 0],
               ['Total Players', players.length],

@@ -154,7 +154,7 @@ export default function Round() {
       <div className="content-wide animate-fadeIn">
 
         {/* ── TOP BAR ── */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+        <div className="responsive-row" style={{ marginBottom: '1.25rem' }}>
           {/* Leave */}
           {!leaveConfirm ? (
             <button
@@ -239,7 +239,7 @@ export default function Round() {
         {error && <div className="error-msg">{error}</div>}
 
         {/* ── MAIN GRID ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', gap: '1.25rem' }}>
+        <div className="responsive-grid-two">
 
           {/* Alive players */}
           <div className="card animate-scaleIn delay-2">
@@ -290,7 +290,7 @@ export default function Round() {
           </div>
 
           {/* Right panel */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <div className="responsive-stack">
 
             {/* Eliminated */}
             <div className="card animate-scaleIn delay-3">
